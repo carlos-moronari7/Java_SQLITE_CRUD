@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".EditDataActivity">
+
+    <ImageView
+        android:id="@+id/profileImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:src="@drawable/default_person"
+        android:scaleType="centerCrop"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/editNameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/profileImageView"
+        android:hint="Name"
+        android:fontFamily="@font/nexa_light"
+        android:layout_marginBottom="16dp" />
+
+    <EditText
+        android:id="@+id/editAgeEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editNameEditText"
+        android:hint="Age"
+        android:inputType="number"
+        android:fontFamily="@font/nexa_light"
+        android:layout_marginBottom="16dp" />
+
+    <Button
+        android:id="@+id/updateDataButton"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/nexa_bold"
+        android:layout_below="@id/editAgeEditText"
+        android:text="Update"
+        android:layout_centerHorizontal="true"
+      />
+
+</RelativeLayout>
