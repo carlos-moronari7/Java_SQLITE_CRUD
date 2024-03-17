@@ -53,4 +53,13 @@ public class CRUDOperations {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         return db.delete("table_user", "id=?", new String[]{String.valueOf(id)});
     }
+
+    // Método para verificar se um ID existe na tabela
+    public boolean checkIfIdExists(int id) {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query("table_user", new String[]{"id"}, "id=?", new String[]{String.valueOf(id)}, null, null, null);
+        boolean exists = cursor.moveToFirst();
+        cursor.close();
+        return exists;
+    }
 }

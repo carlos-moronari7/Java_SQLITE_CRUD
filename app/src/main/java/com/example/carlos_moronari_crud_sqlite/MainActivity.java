@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                 String ageString = ageEditText.getText().toString();
 
                 if (TextUtils.isEmpty(name) || TextUtils.isEmpty(ageString)) {
-                    Toast.makeText(MainActivity.this, "Por favor, preencha todos os campos", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "Please, fill all fields", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
@@ -66,13 +66,13 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     long id = crudOperations.insertData(name, age);
                     if (id != -1) {
-                        Toast.makeText(MainActivity.this, "Dados inseridos com sucesso com ID: " + id, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Data insert with ID: " + id, Toast.LENGTH_SHORT).show();
                     } else {
-                        Toast.makeText(MainActivity.this, "Falha ao inserir dados", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "Failed to insert Data", Toast.LENGTH_SHORT).show();
                     }
                 } catch (Exception e) {
-                    Log.e("MainActivity", "Erro ao inserir dados: " + e.getMessage());
-                    Toast.makeText(MainActivity.this, "Erro ao inserir dados", Toast.LENGTH_SHORT).show();
+                    Log.e("MainActivity", "Failed to insert data " + e.getMessage());
+                    Toast.makeText(MainActivity.this, "Failed to insert data", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -88,14 +88,38 @@ public class MainActivity extends AppCompatActivity {
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int id = Integer.parseInt(idEditText.getText().toString());
-                Cursor cursor = crudOperations.getDataById(id);
+                String idText = idEditText.getText().toString().trim();
+                if (idText.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Please enter an ID", Toast.LENGTH_SHORT).show();
+                    idEditText.setError("You must enter an ID");
+                    idEditText.requestFocus();
+                    return; // Exit the onClick method to prevent further execution
+                }
+
+                int id = 0;
                 String name = null;
-                int age = -1;
-                if (cursor != null && cursor.moveToFirst()) {
-                    name = cursor.getString(cursor.getColumnIndex("name"));
-                    age = cursor.getInt(cursor.getColumnIndex("age"));
-                    cursor.close();
+                int age = 0;
+                try {
+                    id = Integer.parseInt(idText);
+                    Cursor cursor = crudOperations.getDataById(id);
+                    if (cursor != null && cursor.moveToFirst()) {
+                        // Record with the provided ID exists, proceed with update
+                        name = cursor.getString(cursor.getColumnIndex("name"));
+                        age = cursor.getInt(cursor.getColumnIndex("age"));
+                        // Proceed with your update logic here
+                    } else {
+                        // Record with the provided ID does not exist
+                        Toast.makeText(MainActivity.this, "ID does not exist", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    if (cursor != null) {
+                        cursor.close();
+                    }
+                } catch (NumberFormatException e) {
+                    // Handle the case where the ID text cannot be parsed into an integer
+                    Toast.makeText(MainActivity.this, "Invalid ID format", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace(); // Print the exception details to the console for debugging
                 }
 
                 Intent intent = new Intent(MainActivity.this, EditDataActivity.class);
@@ -109,12 +133,30 @@ public class MainActivity extends AppCompatActivity {
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int id = Integer.parseInt(idEditText.getText().toString());
-                int rowsDeleted = crudOperations.deleteData(id);
-                if (rowsDeleted > 0) {
-                    Toast.makeText(MainActivity.this, "Data deleted successfully", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(MainActivity.this, "Failed to delete data", Toast.LENGTH_SHORT).show();
+                String idText = idEditText.getText().toString().trim();
+                if (idText.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Please enter an ID", Toast.LENGTH_SHORT).show();
+                    idEditText.setError("You must enter an ID");
+                    idEditText.requestFocus();
+                    return; // Exit the onClick method to prevent further execution
+                }
+                try {
+                    int id = Integer.parseInt(idText);
+                    int rowsDeleted = crudOperations.deleteData(id);
+                    if (rowsDeleted > 0) {
+                        Toast.makeText(MainActivity.this, "Data deleted successfully", Toast.LENGTH_SHORT).show();
+                    } else {
+                        // Check if the ID does not exist in the database
+                        if (!crudOperations.checkIfIdExists(id)) {
+                            Toast.makeText(MainActivity.this, "ID does not exist", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(MainActivity.this, "Failed to delete data", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                } catch (NumberFormatException e) {
+                    // Handle the case where the ID text cannot be parsed into an integer
+                    Toast.makeText(MainActivity.this, "Invalid ID format", Toast.LENGTH_SHORT).show();
+                    e.printStackTrace(); // Print the exception details to the console for debugging
                 }
             }
         });
